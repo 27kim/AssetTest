@@ -25,8 +25,9 @@ public class BeatBoxFragmnet extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRetainInstance(true);
         mBeatBox = new BeatBox(getActivity());
+
     }
 
     @Nullable
@@ -41,7 +42,7 @@ public class BeatBoxFragmnet extends Fragment {
         return view;
     }
 
-    private class SoundHolder extends RecyclerView.ViewHolder{
+    private class SoundHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Button mButton;
         private Sound mSound;
 
@@ -49,18 +50,25 @@ public class BeatBoxFragmnet extends Fragment {
             super(inflater.inflate(R.layout.list_item_sound, container, false));
             /**itemView 는 ViewHolder 가 가지고 있음*/
             mButton = itemView.findViewById(R.id.list_item_sound_button);
+            mButton.setOnClickListener(this);
         }
 
-        public void bindSound(Sound sound){
+        public void bindSound(Sound sound) {
             mSound = sound;
             mButton.setText(mSound.getName());
         }
+
+        @Override
+        public void onClick(View view) {
+            mBeatBox.play(mSound);
+        }
+
     }
 
-    private class SoundAdapter extends RecyclerView.Adapter<SoundHolder>{
+    private class SoundAdapter extends RecyclerView.Adapter<SoundHolder> {
         private List<Sound> mSounds;
 
-        public SoundAdapter(List<Sound> sounds){
+        public SoundAdapter(List<Sound> sounds) {
             mSounds = sounds;
         }
 
@@ -80,5 +88,11 @@ public class BeatBoxFragmnet extends Fragment {
         public int getItemCount() {
             return mSounds.size();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBeatBox.release();
     }
 }
